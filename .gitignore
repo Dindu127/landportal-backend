@@ -1,0 +1,19 @@
+# Build outputs
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Environment & secrets
+appsettings.*.json
+.env
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
