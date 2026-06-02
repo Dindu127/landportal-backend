@@ -1,5 +1,6 @@
 ﻿// DTOs/SignImageResponse.cs
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LandPortal.Api.DTOs
 {
@@ -9,6 +10,7 @@ namespace LandPortal.Api.DTOs
         public string Url { get; set; } = default!;
         public string PublicUrl { get; set; } = default!;
         public string ContentType { get; set; } = default!;
+        [Column("size_bytes")]
         public long SizeBytes { get; set; }
         public int? Width { get; set; }
         public int? Height { get; set; }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace LandPortal.Api.Entities
@@ -10,6 +11,7 @@ namespace LandPortal.Api.Entities
 
         public string Url { get; set; } = default!;
         public string ContentType { get; set; } = default!;
+        [Column("size_bytes")]
         public long SizeBytes { get; set; }
         public int? Width { get; set; }
         public int? Height { get; set; }

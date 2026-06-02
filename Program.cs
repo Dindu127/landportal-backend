@@ -19,6 +19,7 @@ using LandPortal.Api.Entities;
 using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
+//builder.Configuration.AddEnvironmentVariables();
 var configuration = builder.Configuration;
 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
@@ -72,8 +73,16 @@ var connectionString = configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrWhiteSpace(connectionString))
     throw new InvalidOperationException("Missing ConnectionStrings:DefaultConnection in configuration.");
 
-builder.Services.AddDbContext<LandPortalDbContext>(options =>
-    options.UseSqlServer(connectionString));
+//builder.Services.AddDbContext<LandPortalDbContext>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+//builder.Services.AddDbContext<LandPortalDbContext>(options =>
+//    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), o => o.CommandTimeout(30)));
+
+builder.Services.AddDbContext<LandPortalDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+        o => o.CommandTimeout(30)).UseSnakeCaseNamingConvention());
+
+
 
 // -----------------------------
 // JWT Authentication
@@ -188,11 +197,19 @@ builder.Services.AddSingleton<GcsSignerService>();
 // -----------------------------
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        policy
+            .WithOrigins(
+                "http://localhost:4200",
+                "https://landportal-frontend-c0hgf5b6bfefb9eq.centralindia-01.azurewebsites.net",
+                "https://absquare.site",
+                "https://www.absquare.site",
+                "https://ab-2-dusky.vercel.app"  // your Vercel project
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
@@ -213,7 +230,7 @@ else
 }
 
 app.UseHttpsRedirection();
-app.UseCors();
+app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -1,4 +1,6 @@
-﻿namespace LandPortal.Api.DTOs
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace LandPortal.Api.DTOs
 {
     public class PropertyMediaResponse
     {
@@ -6,6 +8,7 @@
         public Guid PropertyId { get; set; }
         public string Url { get; set; } = default!;
         public string? ContentType { get; set; }
+        [Column("size_bytes")]
         public long SizeBytes { get; set; }
         public int? Width { get; set; }
         public int? Height { get; set; }

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using LandPortal.Api.Data;
 using LandPortal.Api.Entities;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace LandPortal.Api.Services
@@ -50,25 +49,25 @@ namespace LandPortal.Api.Services
                 cmd.CommandText = "dbo.Sp_InsertContactUnlockLog";
                 // optional: cmd.CommandTimeout = 60;
 
-                cmd.Parameters.Add(new SqlParameter("@PropertyId", SqlDbType.UniqueIdentifier) { Value = log.PropertyId });
-                cmd.Parameters.Add(new SqlParameter("@PropertyTitle", SqlDbType.NVarChar, 250) { Value = (object?)log.PropertyTitle ?? DBNull.Value });
-                cmd.Parameters.Add(new SqlParameter("@UnlockedByUserId", SqlDbType.UniqueIdentifier) { Value = log.UnlockedByUserId });
-                cmd.Parameters.Add(new SqlParameter("@UnlockedByUserEmail", SqlDbType.NVarChar, 200) { Value = (object?)log.UnlockedByUserEmail ?? DBNull.Value });
-                cmd.Parameters.Add(new SqlParameter("@UnlockedByUserName", SqlDbType.NVarChar, 200) { Value = (object?)log.UnlockedByUserName ?? DBNull.Value });
+                //cmd.Parameters.Add(new SqlParameter("@PropertyId", SqlDbType.UniqueIdentifier) { Value = log.PropertyId });
+                //cmd.Parameters.Add(new SqlParameter("@PropertyTitle", SqlDbType.NVarChar, 250) { Value = (object?)log.PropertyTitle ?? DBNull.Value });
+                //cmd.Parameters.Add(new SqlParameter("@UnlockedByUserId", SqlDbType.UniqueIdentifier) { Value = log.UnlockedByUserId });
+                //cmd.Parameters.Add(new SqlParameter("@UnlockedByUserEmail", SqlDbType.NVarChar, 200) { Value = (object?)log.UnlockedByUserEmail ?? DBNull.Value });
+                //cmd.Parameters.Add(new SqlParameter("@UnlockedByUserName", SqlDbType.NVarChar, 200) { Value = (object?)log.UnlockedByUserName ?? DBNull.Value });
 
-                cmd.Parameters.Add(new SqlParameter("@PaymentId", SqlDbType.NVarChar, 200) { Value = (object?)log.PaymentId ?? DBNull.Value });
+                //cmd.Parameters.Add(new SqlParameter("@PaymentId", SqlDbType.NVarChar, 200) { Value = (object?)log.PaymentId ?? DBNull.Value });
 
-                var pAmt = new SqlParameter("@PaymentAmount", SqlDbType.Decimal)
-                {
-                    Precision = 18,
-                    Scale = 2,
-                    Value = (object?)log.PaymentAmount ?? DBNull.Value
-                };
-                cmd.Parameters.Add(pAmt);
+                //var pAmt = new SqlParameter("@PaymentAmount", SqlDbType.Decimal)
+                //{
+                //    Precision = 18,
+                //    Scale = 2,
+                //    Value = (object?)log.PaymentAmount ?? DBNull.Value
+                //};
+                //cmd.Parameters.Add(pAmt);
 
-                cmd.Parameters.Add(new SqlParameter("@Currency", SqlDbType.NVarChar, 10) { Value = (object?)log.Currency ?? DBNull.Value });
-                cmd.Parameters.Add(new SqlParameter("@PaymentStatus", SqlDbType.NVarChar, 50) { Value = (object?)log.PaymentStatus ?? DBNull.Value });
-                cmd.Parameters.Add(new SqlParameter("@Notes", SqlDbType.NVarChar, 1000) { Value = (object?)log.Notes ?? DBNull.Value });
+                //cmd.Parameters.Add(new SqlParameter("@Currency", SqlDbType.NVarChar, 10) { Value = (object?)log.Currency ?? DBNull.Value });
+                //cmd.Parameters.Add(new SqlParameter("@PaymentStatus", SqlDbType.NVarChar, 50) { Value = (object?)log.PaymentStatus ?? DBNull.Value });
+                //cmd.Parameters.Add(new SqlParameter("@Notes", SqlDbType.NVarChar, 1000) { Value = (object?)log.Notes ?? DBNull.Value });
 
                 await cmd.ExecuteNonQueryAsync();
             }

@@ -8,7 +8,6 @@ using LandPortal.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client.Extensions.Msal;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
@@ -169,7 +168,7 @@ namespace LandPortal.Api.Controllers
                 return Unauthorized();
 
             var userId = Guid.Parse(userIdClaim);
-            var user = await _db.Users.FindAsync(userId);
+            var user = await _db.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Id == userId);
 
             if (user == null)
                 return NotFound();

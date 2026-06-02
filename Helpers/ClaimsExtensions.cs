@@ -27,6 +27,12 @@ namespace LandPortal.Api.Helpers
             return userId;
         }
 
+        public static string GetRole(this ClaimsPrincipal user)
+        {
+            return user.FindFirst(ClaimTypes.Role)?.Value ?? "User";
+        }
+
+
         public static bool IsAdmin(this ClaimsPrincipal user)
             => user?.IsInRole("Admin") ?? false;
     }

@@ -1,4 +1,6 @@
-﻿public class SignImageRequest
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+public class SignImageRequest
 {
     public string FileName { get; set; } = default!;
     public string ContentType { get; set; } = "image/jpeg";
@@ -8,6 +10,7 @@ public class CommitImageRequest
 {
     public string Url { get; set; } = default!;
     public string ContentType { get; set; } = default!;
+    [Column("size_bytes")]
     public long SizeBytes { get; set; }
     public int? Width { get; set; }
     public int? Height { get; set; }

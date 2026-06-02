@@ -27,7 +27,7 @@ namespace LandPortal.Api.Controllers
             pageSize = Math.Clamp(pageSize, 1, 100);
 
             var q = _db.Properties.AsNoTracking()
-                    .Where(p => p.Status == status)
+                    .Where(p => p.Status == status.ToString())
                     .OrderByDescending(p => p.UpdatedAt);
 
             var total = await q.CountAsync();
@@ -73,7 +73,7 @@ namespace LandPortal.Api.Controllers
             var p = await _db.Properties.FindAsync(id);
             if (p == null) return NotFound();
 
-            p.Status = PropertyStatus.Approved;
+            p.Status = PropertyStatus.Approved.ToString();
             p.ListedAt ??= DateTime.UtcNow;
             p.UpdatedAt = DateTime.UtcNow;
             await _db.SaveChangesAsync();
@@ -86,7 +86,7 @@ namespace LandPortal.Api.Controllers
             var p = await _db.Properties.FindAsync(id);
             if (p == null) return NotFound();
 
-            p.Status = PropertyStatus.Rejected;
+            p.Status = PropertyStatus.Rejected.ToString();
             p.UpdatedAt = DateTime.UtcNow;
             await _db.SaveChangesAsync();
             return NoContent();

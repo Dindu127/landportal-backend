@@ -24,6 +24,7 @@ namespace LandPortal.Api.Controllers
     public class PropertyImagesController : ControllerBase
     {
         private readonly GcsSignerService _gcs;
+        private readonly GcpStorageService _gcpStorage;
         private readonly LandPortalDbContext _db;
         private readonly ILogger<PropertyImagesController> _logger;
         private readonly IConfiguration _config;
@@ -32,13 +33,81 @@ namespace LandPortal.Api.Controllers
             GcsSignerService gcs,
             LandPortalDbContext db,
             ILogger<PropertyImagesController> logger,
-            IConfiguration config)
+            IConfiguration config,
+            GcpStorageService gcpStorage)
         {
             _gcs = gcs;
             _db = db;
             _logger = logger;
             _config = config;
+            _gcpStorage = gcpStorage;
         }
+
+//[HttpPost("upload")]
+//[Authorize]
+//[RequestSizeLimit(20_000_000)]
+//public async Task<IActionResult> Upload(
+//    [FromRoute] Guid propertyId,
+//    [FromForm] IFormFile file)
+//{
+//    if (file == null || file.Length == 0)
+//        return BadRequest("File is required");
+
+//    var property = await _db.Properties
+//        .Include(p => p.Media)
+//        .FirstOrDefaultAsync(p => p.Id == propertyId);
+
+//    if (property == null)
+//        return NotFound("Property not found");
+
+//    var userId = User.GetUserId();
+//    var role = User.GetRole();
+
+//    if (role != "Admin" && property.OwnerId != userId)
+//        return Forbid();
+
+//    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+//    var objectPath = $"images/properties/{propertyId}/{fileName}";
+
+//    string publicUrl;
+//    using (var stream = file.OpenReadStream())
+//    {
+//        publicUrl = await _gcpStorage.UploadAsync(
+//            stream,
+//            objectPath,
+//            file.ContentType ?? "application/octet-stream"
+//        );
+//    }
+
+//    var media = new PropertyMedia
+//    {
+//        Id = Guid.NewGuid(),
+//        PropertyId = propertyId,
+//        Url = publicUrl,
+//        PublicUrl = publicUrl,
+//        Path = objectPath,
+//        ContentType = file.ContentType!,
+//        SizeBytes = file.Length,
+//        CreatedAt = DateTime.UtcNow,
+//        SortOrder = property.Media.Count + 1,
+//        IsCover = !property.Media.Any()
+//    };
+
+//    _db.PropertyMedia.Add(media);
+
+//    if (media.IsCover)
+//        property.CoverImageUrl = publicUrl;
+
+//    await _db.SaveChangesAsync();
+
+//    return Ok(new
+//    {
+//        media.Id,
+//        media.Url,
+//        media.IsCover
+//    });
+//}
+
 
         // 1) Request signed URL
         // POST /api/properties/{propertyId}/images/sign
@@ -50,6 +119,19 @@ namespace LandPortal.Api.Controllers
 
             var fileName = string.IsNullOrWhiteSpace(req.FileName) ? $"{Guid.NewGuid()}.jpg" : req.FileName;
             var objectName = $"images/properties/{propertyId}/{Guid.NewGuid()}-{fileName}";
+            var property = _db.Properties
+            .AsNoTracking()
+            .FirstOrDefault(p => p.Id == propertyId);
+
+            if (property == null)
+                return NotFound(new { detail = "Property not found" });
+
+            // ✅ ONLY OWNER OR ADMIN
+            var userId = User.GetUserId();   // your existing helper
+            var role = User.GetRole();
+
+            if (role != "Admin" && property.OwnerId != userId)
+                return Forbid();
 
             // Create a short-lived signed upload URL
             var signedUrl = _gcs.CreateSignedUploadUrl(objectName, TimeSpan.FromMinutes(15), req.ContentType ?? "image/jpeg");
@@ -85,6 +167,13 @@ namespace LandPortal.Api.Controllers
                 _logger.LogWarning("Property not found for commit: {PropertyId}", propertyId);
                 return NotFound(new { detail = "Property not found" });
             }
+
+            var userId = User.GetUserId();
+            var role = User.GetRole();
+
+            if (role != "Admin" && property.OwnerId != userId)
+                return Forbid();
+
 
             _logger.LogInformation(
                 "Property before commit: Id={Id} CoverImageUrl={Cover}",
@@ -194,7 +283,7 @@ namespace LandPortal.Api.Controllers
                     // In dev, return full exception to see exact SQL error text
                     return Problem(detail: ex.ToString(), statusCode: 500);
                 }
-
+                Console.WriteLine(ex);
                 return Problem(detail: "Failed saving property media", statusCode: 500);
             }
         }

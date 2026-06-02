@@ -7,23 +7,25 @@ public class GcpStorageService
 
     public GcpStorageService(IConfiguration config)
     {
-        _client = StorageClient.Create();
+       _client = StorageClient.Create();
         _bucket = config["Gcs:Bucket"]
             ?? throw new Exception("Gcs:Bucket not configured");
 
     }
 
-    public async Task<string> UploadAsync(Stream file, string fileName, string contentType)
+    public async Task<string> UploadAsync(  Stream file,  string objectPath, string contentType )
     {
-        var obj = await _client.UploadObjectAsync(
+        await _client.UploadObjectAsync(
             _bucket,
-            $"properties/{Guid.NewGuid()}_{fileName}",
+            objectPath,                // ✅ USE EXACT PATH FROM CONTROLLER
             contentType,
             file
         );
 
-        return $"https://storage.googleapis.com/{_bucket}/{obj.Name}";
+        return $"https://storage.googleapis.com/{_bucket}/{objectPath}";
     }
+
+
 
     public async Task DeleteAsync(string url)
     {
